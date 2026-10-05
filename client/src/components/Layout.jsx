@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useT } from '../i18n/index.jsx';
 import { useSession } from '../session.jsx';
 import LanguageToggle from './LanguageToggle.jsx';
+import ConnectionBadge from './ConnectionBadge.jsx';
 
 const NAV = [
   { to: '/', key: 'nav.dashboard', icon: '🏠' },
@@ -23,6 +24,7 @@ export default function Layout() {
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-wide text-emerald-200">Duka Ledger</p>
           <h1 className="truncate font-semibold">{shop?.name}</h1>
+          <ConnectionBadge />
         </div>
         <div className="flex items-center gap-2">
           <LanguageToggle />

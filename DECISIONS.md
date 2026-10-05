@@ -181,3 +181,33 @@ Short notes on the important choices and why. Newest phase at the bottom.
   phone's message list. A real Africa's Talking adapter would call the API and log the same row.
 - **6 tabs in the bottom nav** (Today, Customers, New, Products, M-Pesa, SMS), so every demo
   page is one tap away.
+
+## Phase 5 — Offline + demo polish
+
+- **"Offline" = no network (`navigator.onLine` false) OR our API didn't answer.** A fetch
+  that throws, or a 5xx with no JSON (the Vite proxy when Express is down), marks the API
+  unreachable; any good answer, or a health check every 10 s, clears it. One hook, `useOnline()`.
+- **Offline writes go to an IndexedDB outbox (Dexie)**, keyed by the transaction's own
+  device-made UUID. Synced with one `POST /api/sync` per batch, oldest first: on start,
+  when the connection returns, and every 20 s.
+- **`/api/sync` handles each entry independently:** `saved` / `duplicate` (already there:
+  a resent batch changes nothing, stock moves once) / `rejected` (bad data, e.g. no
+  customer). Rejected entries stay on the device with the error and a Discard button;
+  they are not retried forever. A server error (5xx) fails the whole batch so it is retried.
+- **AI entries confirmed offline sync as "create (draft) + confirm"** (`confirm: true`).
+  The server still applies the AI-is-draft rule, then replays the shopkeeper's confirmation.
+- **Offline AI = the server's own `rules.js` + `match.js`, bundled into the client** through
+  a Vite alias (`@server-ai`). One parser, not two copies that drift apart.
+- **Reads offline come from a cache of every GET response** (IndexedDB `cache` table). Pages
+  show a "saved data" note. A customer page never opened online falls back to the cached
+  customer list (balance, status) without history.
+- **Offline-only limits (kept simple on purpose):** M-Pesa, SMS, void, editing server drafts
+  and creating new customers need a connection (buttons disabled / clear message). No
+  pulling of server changes and no conflict handling: listed as future work.
+- **Entries waiting to sync are shown but not counted.** Balances and totals are server
+  numbers; the dashboard lists pending entries separately so nothing is double-counted.
+- **The demo script recommends DevTools → Network → Offline** over turning Wi-Fi off: with
+  Docker/VPN adapters Chrome can still report "online" without Wi-Fi.
+- Verified end to end in Chromium (Playwright): offline reload served by the service worker,
+  AI sentence parsed in the browser, 2 entries queued, auto-sync on reconnect, balances
+  and totals updated once.

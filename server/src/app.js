@@ -12,6 +12,7 @@ import reportRoutes from './routes/reports.js';
 import aiRoutes from './routes/ai.js';
 import mpesaRoutes, { mpesaCallback } from './routes/mpesa.js';
 import smsRoutes from './routes/sms.js';
+import syncRoutes from './routes/sync.js';
 
 // The app is built here and started in server.js, so tests can use it
 // with Supertest without opening a real port.
@@ -39,6 +40,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/mpesa', mpesaRoutes);
 app.use('/api/sms', smsRoutes);
+app.use('/api/sync', syncRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

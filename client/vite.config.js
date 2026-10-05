@@ -2,6 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { fileURLToPath } from 'node:url';
+
+// The offline "basic mode" runs the SERVER's rules parser in the browser.
+// One copy of the code, used in both places (see src/lib/offlineParse.js).
+const serverAi = fileURLToPath(new URL('../server/src/providers/ai', import.meta.url));
+const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // The browser only ever calls /api/...; Vite forwards it to Express.
 // Same origin = no CORS, and the client never hard-codes the server URL.
@@ -30,6 +36,7 @@ export default defineConfig({
       },
     }),
   ],
-  server: { port: 5173, proxy: apiProxy },
+  resolve: { alias: { '@server-ai': serverAi } },
+  server: { port: 5173, proxy: apiProxy, fs: { allow: [repoRoot] } }, // allow importing ../server files
   preview: { port: 4173, proxy: apiProxy },
 });

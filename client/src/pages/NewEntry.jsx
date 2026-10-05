@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '../api/client.js';
 import { useApi } from '../api/useApi.js';
 import { useT } from '../i18n/index.jsx';
 import { newId } from '../lib/ids.js';
+import { saveOrQueue } from '../sync/outbox.js';
 import { ErrorBox, Loading } from '../components/Status.jsx';
 import AiEntry from '../components/AiEntry.jsx';
 import DraftsList from '../components/DraftsList.jsx';
@@ -23,10 +23,13 @@ export default function NewEntry() {
   if (customers.loading || products.loading) return <Loading />;
   if (customers.error || products.error) return <ErrorBox error={customers.error || products.error} />;
 
+  // Online: saved at once. Offline: kept in the outbox and synced later.
   const saveManual = async ({ new_customer_name, ...fields }) => {
     const body = { id: newId(), ...fields, created_at: new Date().toISOString() };
-    await api('/transactions', { method: 'POST', body });
-    navigate(body.customer_id ? `/customers/${body.customer_id}` : '/');
+    const customerName = customers.data.find((c) => c.id === body.customer_id)?.name ?? null;
+    const amount = body.amount ?? body.items.reduce((sum, i) => sum + Math.round(i.quantity * i.unit_price), 0);
+    const { queued } = await saveOrQueue(body, { summary: { type: body.type, customer_name: customerName, amount } });
+    navigate(body.customer_id && !queued ? `/customers/${body.customer_id}` : '/');
   };
 
   const tab = (key, label) => (

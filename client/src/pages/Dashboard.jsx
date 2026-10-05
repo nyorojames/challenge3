@@ -4,6 +4,7 @@ import { useT } from '../i18n/index.jsx';
 import { formatKES } from '../lib/format.js';
 import { ErrorBox, Loading } from '../components/Status.jsx';
 import TransactionRow from '../components/TransactionRow.jsx';
+import PendingList from '../components/PendingList.jsx';
 
 function Card({ title, value, sub, tone = 'slate', to }) {
   const tones = {
@@ -46,6 +47,9 @@ export default function Dashboard() {
           ))}
         </div>
       </section>
+
+      {summary.stale && <p className="rounded-lg bg-slate-100 p-2 text-xs text-slate-600">{t('offline.stale')}</p>}
+      <PendingList />
 
       {s.draft_count > 0 && (
         <Link to="/new" className="block rounded-lg bg-sky-50 p-3 text-sm text-sky-800 ring-1 ring-sky-200">

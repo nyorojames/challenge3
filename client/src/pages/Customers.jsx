@@ -6,6 +6,7 @@ import { useT } from '../i18n/index.jsx';
 import { formatKES } from '../lib/format.js';
 import { ErrorBox, Loading } from '../components/Status.jsx';
 import DueBadge from '../components/DueBadge.jsx';
+import { useOnline } from '../sync/connectivity.js';
 
 const FILTERS = {
   all: () => true,
@@ -56,6 +57,7 @@ export default function Customers() {
   const [search, setSearch] = useState('');
   const [adding, setAdding] = useState(false);
   const [reminderResult, setReminderResult] = useState(null);
+  const online = useOnline();
   const filter = FILTERS[params.get('filter')] ? params.get('filter') : 'all';
 
   if (loading && !data) return <Loading />;
@@ -97,7 +99,7 @@ export default function Customers() {
       )}
 
       {overdueCount > 0 && (
-        <button onClick={remindAllOverdue} className="w-full rounded-lg bg-red-50 py-2 text-sm font-semibold text-red-800 ring-1 ring-red-200">
+        <button disabled={!online} onClick={remindAllOverdue} className="w-full rounded-lg bg-red-50 py-2 text-sm font-semibold text-red-800 ring-1 ring-red-200 disabled:opacity-40">
           {t('sms.remind_all', { count: overdueCount })}
         </button>
       )}

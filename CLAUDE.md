@@ -19,8 +19,8 @@ abstractions, explain decisions**.
 - Ask when ambiguous. Never commit secrets (`.env` is gitignored; keep `.env.example` current).
 
 ## Phases
-0 Setup ✅ · 1 Backend core ✅ · 2 Frontend core ✅ · 3 AI entry ✅ · 4 Mock M-Pesa + SMS (built, awaiting approval) ·
-5 Offline + demo polish. (Update the ✅ as phases are approved.)
+0 Setup ✅ · 1 Backend core ✅ · 2 Frontend core ✅ · 3 AI entry ✅ · 4 Mock M-Pesa + SMS ✅ ·
+5 Offline + demo polish (built, awaiting approval). (Update the ✅ as phases are approved.)
 
 ## Stack
 - `server/`: Node 22, Express 5, ES modules, `pg` with **plain SQL (no ORM)**, zod,
@@ -80,6 +80,9 @@ UUID prefixes: `a…` shop/user, `b…` suppliers, `c…` products, `d…` custo
   Daraja-shaped responses/callbacks. `POST /api/mpesa/callback` is mounted BEFORE requireAuth.
 - `services/reminders.js` — SMS text in the shop's language (≤160 chars), remind one /
   all overdue (20 h anti-spam). `providers/sms/mock.js` writes to `sms_messages`.
+- `services/sync.js` + `POST /api/sync` — batch of `{transaction, confirm}` from the offline
+  outbox; per item saved/duplicate/rejected; `confirm` replays an offline AI confirmation.
+  `transactionSchema` lives in `routes/schemas.js` (shared by transactions + sync).
 - Tests: `tests/helpers.js#createTestShop()` makes an isolated shop + token; clean up after.
 
 ## Code map (client)
@@ -93,5 +96,10 @@ UUID prefixes: `a…` shop/user, `b…` suppliers, `c…` products, `d…` custo
   Products (`?low=1`), NewEntry (tabs: AI sentence | form; `?type=&customer=` opens the form).
 - `components/EntryForm.jsx` is shared by manual entry and AI draft review; `AiEntry.jsx`
   (parse → auto-draft → confirm/discard), `DraftsList.jsx`.
+- Offline: `db/index.js` (Dexie: `outbox`, `cache`), `sync/connectivity.js` (`isOnline`,
+  `useOnline`: navigator.onLine AND API reachable), `sync/outbox.js` (`saveOrQueue`,
+  `syncOutbox`, `startAutoSync`, `useOutbox`), `lib/offlineParse.js` (server rules.js via the
+  `@server-ai` Vite alias). `useApi` caches every GET and serves it offline (`stale`).
+  `ConnectionBadge` (header), `PendingList` (dashboard). M-Pesa/SMS/void are online-only.
 - `components/PhoneSimulator.jsx` (amount → STK prompt with PIN → confirmation), pages
   `Mpesa.jsx` (unmatched assign, walk-in request, dev "resend last callback"), `SmsOutbox.jsx`.

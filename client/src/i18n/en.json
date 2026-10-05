@@ -189,5 +189,21 @@
     "open_outbox": "Open SMS outbox",
     "remind_all": "✉️ Remind all overdue ({count})",
     "bulk_result": "{sent} SMS sent, {skipped} skipped (no phone or already reminded today)."
+  },
+  "offline": {
+    "online": "Online",
+    "offline": "Offline",
+    "pending": "{count} waiting",
+    "synced": "{count} synced",
+    "waiting_title": "Not sent yet: {count}",
+    "waiting_offline": "Saved on this device. They will be sent when the connection is back.",
+    "waiting_online": "Sending now…",
+    "rejected": "Rejected",
+    "stale": "You are seeing saved data (offline).",
+    "parsed_offline": "Offline: read with simple rules on this device. It will be sent when the connection is back.",
+    "need_online_customer": "You need a connection to add a new customer. Pick an existing customer, or wait.",
+    "need_online_draft": "This draft is on the server: confirm it when the connection is back.",
+    "needs_connection": "M-Pesa and SMS need a connection.",
+    "history_online": "The history will show when the connection is back."
   }
 }

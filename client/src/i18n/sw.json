@@ -189,5 +189,21 @@
     "open_outbox": "Fungua SMS",
     "remind_all": "✉️ Kumbusha wote waliochelewa ({count})",
     "bulk_result": "SMS {sent} zimetumwa, {skipped} zimerukwa (hakuna simu au walikumbushwa leo)."
+  },
+  "offline": {
+    "online": "Mtandaoni",
+    "offline": "Nje ya mtandao",
+    "pending": "{count} zinasubiri",
+    "synced": "{count} zimesawazishwa",
+    "waiting_title": "Hazijatumwa: {count}",
+    "waiting_offline": "Zimehifadhiwa kwenye simu hii. Zitatumwa mtandao ukirudi.",
+    "waiting_online": "Zinatumwa sasa…",
+    "rejected": "Imekataliwa",
+    "stale": "Unaona data iliyohifadhiwa (nje ya mtandao).",
+    "parsed_offline": "Nje ya mtandao: nimesoma kwa kanuni rahisi kwenye simu. Itatumwa mtandao ukirudi.",
+    "need_online_customer": "Unahitaji mtandao kuongeza mteja mpya. Chagua mteja aliyepo, au subiri mtandao.",
+    "need_online_draft": "Rasimu hii iko kwenye seva: thibitisha mtandao ukirudi.",
+    "needs_connection": "M-Pesa na SMS zinahitaji mtandao.",
+    "history_online": "Historia itaonekana mtandao ukirudi."
   }
 }

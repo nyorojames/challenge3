@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useT } from '../i18n/index.jsx';
 import { newId } from '../lib/ids.js';
+import { parseOffline } from '../lib/offlineParse.js';
+import { isOnline } from '../sync/connectivity.js';
+import { saveOrQueue } from '../sync/outbox.js';
 import EntryForm from './EntryForm.jsx';
 
 // Tap-to-try sentences for the demo (they are data, so not translated).
@@ -15,6 +18,7 @@ const EXAMPLES = [
 ];
 
 const NEEDS_CUSTOMER = ['credit_sale', 'payment'];
+const sumItems = (items) => items.reduce((sum, i) => sum + Math.round(i.quantity * i.unit_price), 0);
 
 // Turn the AI's entry into the fields POST/PUT /api/transactions expects.
 function entryToTransaction(entry) {
@@ -55,7 +59,17 @@ export default function AiEntry({ customers, products, onDraftsChanged }) {
     setResult(null);
     setDraftId(null);
     try {
-      const parsed = await api('/ai/parse', { method: 'POST', body: { text: sentence } });
+      // Online: the server's AI (with its own fallback). Offline, or the request
+      // fails for lack of network: the same rules parser, here in the browser.
+      let parsed = null;
+      if (isOnline()) {
+        try {
+          parsed = await api('/ai/parse', { method: 'POST', body: { text: sentence } });
+        } catch (err) {
+          if (err.status !== 0) throw err;
+        }
+      }
+      parsed ??= parseOffline(sentence, { customers, products });
       const now = new Date().toISOString();
       setHappenedAt(now);
       setResult(parsed);
@@ -68,7 +82,7 @@ export default function AiEntry({ customers, products, onDraftsChanged }) {
         entry.amount > 0 &&
         (!NEEDS_CUSTOMER.includes(entry.type) || entry.customer_id) &&
         entry.items.every((i) => i.unit_price != null);
-      if (complete) {
+      if (complete && isOnline()) {
         const id = newId();
         await api('/transactions', {
           method: 'POST',
@@ -85,6 +99,19 @@ export default function AiEntry({ customers, products, onDraftsChanged }) {
   };
 
   const confirm = async ({ new_customer_name, ...fields }) => {
+    if (!isOnline()) {
+      // Offline: queue it. "confirm: true" tells the server the shopkeeper already
+      // confirmed this AI entry on the device; it is saved as a draft, then confirmed.
+      if (new_customer_name) throw new Error(t('offline.need_online_customer'));
+      if (draftId) throw new Error(t('offline.need_online_draft'));
+      const customerName = customers.find((c) => c.id === fields.customer_id)?.name ?? null;
+      await saveOrQueue(
+        { id: newId(), ...fields, source: 'ai', raw_input: result.raw_input, created_at: happenedAt },
+        { confirm: true, summary: { type: fields.type, customer_name: customerName, amount: fields.amount ?? sumItems(fields.items) } }
+      );
+      navigate('/');
+      return;
+    }
     if (new_customer_name) {
       const customer = await api('/customers', { method: 'POST', body: { name: new_customer_name } });
       fields.customer_id = customer.id;
@@ -161,7 +188,11 @@ export default function AiEntry({ customers, products, onDraftsChanged }) {
           </div>
 
           <p className="text-sm italic text-slate-600">“{result.raw_input}”</p>
-          {result.basic_mode && <p className="text-xs text-amber-800">{t('ai.basic_mode_hint')}</p>}
+          {result.basic_mode && (
+            <p className="text-xs text-amber-800">
+              {result.fallback_reason === 'offline' ? t('offline.parsed_offline') : t('ai.basic_mode_hint')}
+            </p>
+          )}
 
           {entry.confidence < 0.6 && <p className="rounded bg-red-50 p-2 text-sm text-red-700">{t('ai.low_confidence')}</p>}
           {entry.new_customer && (

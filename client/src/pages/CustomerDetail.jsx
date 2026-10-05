@@ -8,11 +8,21 @@ import { ErrorBox, Loading } from '../components/Status.jsx';
 import DueBadge from '../components/DueBadge.jsx';
 import TransactionRow from '../components/TransactionRow.jsx';
 import PhoneSimulator from '../components/PhoneSimulator.jsx';
+import { useOnline } from '../sync/connectivity.js';
 
 export default function CustomerDetail() {
   const { id } = useParams();
   const { t } = useT();
-  const { data: customer, error, loading, reload } = useApi(`/customers/${id}`);
+  const detail = useApi(`/customers/${id}`);
+  // Offline and this page was never opened online: fall back to the saved
+  // customer list (balance and due status), without the history.
+  const list = useApi(detail.error?.status === 0 ? '/customers' : null);
+  const fromList = list.data?.find((c) => c.id === id);
+  const customer = detail.data ?? (fromList && { ...fromList, history: [], historyMissing: true });
+  const { reload } = detail;
+  const loading = detail.loading || list.loading;
+  const error = customer ? null : detail.error;
+  const online = useOnline(); // M-Pesa, SMS and void need the server
   const [payingByMpesa, setPayingByMpesa] = useState(false);
   const [smsNotice, setSmsNotice] = useState(null);
 
@@ -59,14 +69,15 @@ export default function CustomerDetail() {
 
       {customer.phone && customer.balance > 0 && (
         <div className="grid grid-cols-2 gap-2">
-          <button onClick={() => setPayingByMpesa(true)} className="rounded-lg bg-green-600 py-2.5 font-semibold text-white">
+          <button disabled={!online} onClick={() => setPayingByMpesa(true)} className="rounded-lg bg-green-600 py-2.5 font-semibold text-white disabled:opacity-40">
             {t('customer.request_mpesa')}
           </button>
-          <button onClick={remind} className="rounded-lg bg-white py-2.5 font-semibold text-slate-700 ring-1 ring-slate-300">
+          <button disabled={!online} onClick={remind} className="rounded-lg bg-white py-2.5 font-semibold text-slate-700 ring-1 ring-slate-300 disabled:opacity-40">
             {t('customer.remind')}
           </button>
         </div>
       )}
+      {!online && customer.balance > 0 && <p className="text-xs text-slate-500">{t('offline.needs_connection')}</p>}
       {smsNotice && (
         <p className={`rounded-lg p-3 text-sm ${smsNotice.ok ? 'bg-green-50 text-green-900' : 'bg-red-50 text-red-700'}`}>
           {smsNotice.ok && <strong>{t('customer.reminded')} </strong>}
@@ -101,10 +112,11 @@ export default function CustomerDetail() {
 
       <section className="rounded-xl border border-slate-200 bg-white px-4 shadow-sm">
         <h3 className="pt-3 font-semibold text-slate-700">{t('customer.history')}</h3>
-        {customer.history.length === 0 && <p className="py-4 text-sm text-slate-500">{t('customer.history_empty')}</p>}
+        {customer.historyMissing && <p className="py-4 text-sm text-slate-500">{t('offline.history_online')}</p>}
+        {!customer.historyMissing && customer.history.length === 0 && <p className="py-4 text-sm text-slate-500">{t('customer.history_empty')}</p>}
         <ul className="divide-y divide-slate-100">
           {customer.history.map((tx) => (
-            <TransactionRow key={tx.id} tx={tx} showCustomer={false} onVoid={voidEntry} />
+            <TransactionRow key={tx.id} tx={tx} showCustomer={false} onVoid={online ? voidEntry : undefined} />
           ))}
         </ul>
       </section>
