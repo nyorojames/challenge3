@@ -103,7 +103,9 @@
     "save": "Save entry",
     "saved": "Saved ✓",
     "need_customer": "Choose a customer",
-    "need_amount": "Enter an amount or add items"
+    "need_amount": "Enter an amount or add items",
+    "tab_ai": "✨ Type a sentence",
+    "tab_manual": "📝 Fill a form"
   },
   "tx": {
     "cash_sale": "Cash sale",
@@ -116,5 +118,26 @@
     "cash": "Cash",
     "mpesa": "M-Pesa",
     "credit": "Credit"
+  },
+  "ai": {
+    "title": "Type it the way you'd say it",
+    "placeholder": "e.g. Mama Wanjiku took 2kg sugar and oil, will pay Friday",
+    "parse": "✨ Read it",
+    "parsing": "Reading…",
+    "try": "Try:",
+    "basic_mode": "Basic mode",
+    "basic_mode_hint": "AI is unavailable right now, so simple rules were used. Check before confirming.",
+    "confidence": "{pct}% sure",
+    "low_confidence": "Not sure. Please check everything before confirming.",
+    "saved_draft": "Saved as draft",
+    "not_saved": "Not saved yet: complete it below",
+    "new_customer": "\"{name}\" isn't one of your customers yet. Pick a customer, or add them as new.",
+    "create_customer": "➕ New customer: {name}",
+    "unknown_item": "{name} (not in your products)",
+    "unknown_items": "Not in your products: {names}. Set a price or pick a product.",
+    "notes": "Note: {notes}",
+    "confirm": "Confirm",
+    "discard": "Discard",
+    "drafts": "{count} drafts waiting"
   }
 }

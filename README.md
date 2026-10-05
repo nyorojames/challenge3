@@ -8,7 +8,7 @@ working offline.
 A localized clone of **Rational** (YC Summer 2026), "an
 accounting firm run entirely by AI employees".
 
-> 🚧 Work in progress. Phases 0–2 (setup, backend API, frontend core) are done. The demo script and full docs come in Phase 5.
+> 🚧 Work in progress. Phases 0–3 (setup, backend API, frontend core, AI entry) are done. The demo script and full docs come in Phase 5.
 
 ## Demo login
 
@@ -103,6 +103,28 @@ Try it:
 curl -s -X POST localhost:4000/api/auth/login -H 'content-type: application/json' \
   -d '{"phone":"0712345678","password":"duka1234"}'
 ```
+
+## 5. AI entry: choose a provider (all free)
+
+Set `AI_PROVIDER` in `server/.env`:
+
+| Provider | Needs | Notes |
+|---|---|---|
+| `rules` (default) | nothing | Rule-based Swahili/English/Sheng parser. Works offline, never fails. |
+| `gemini` | free key from [Google AI Studio](https://aistudio.google.com/apikey) in `GEMINI_API_KEY` | Model from `LLM_MODEL`. Free tier has rate limits; a 429 falls back to rules. |
+| `ollama` | [Ollama](https://ollama.com) running locally, then `ollama pull llama3.2:3b` | Model from `OLLAMA_MODEL`. Fully offline once downloaded. |
+
+If the chosen provider errors, takes longer than `AI_TIMEOUT_MS` (5 s), or returns
+invalid JSON, the server uses the rules parser and the UI shows a **Basic mode** badge.
+The LLM prompt is in `server/src/providers/ai/prompt.txt`; edit it freely.
+
+Flow: type a sentence → the server suggests an entry → it is saved as a **draft** →
+you check/edit it → **Confirm** puts it in the ledger (or **Discard** voids it).
+
+| Method | Path | What it does |
+|---|---|---|
+| POST | `/api/ai/parse` | `{ text }` → `{ entry, provider, basic_mode, fallback_reason, raw_input }` (writes nothing) |
+| PUT | `/api/transactions/:id` | edit a draft (409 once confirmed) |
 
 ## Project layout
 

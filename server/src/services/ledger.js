@@ -236,6 +236,44 @@ export async function createTransaction(shopId, userId, input) {
   });
 }
 
+/**
+ * Replaces a DRAFT's contents with the shopkeeper's corrections (type, customer,
+ * items, amount, ...). Confirmed entries cannot be edited, only voided, so the
+ * ledger history stays honest. Drafts never moved stock, so no stock changes here.
+ */
+export async function updateDraft(shopId, id, input) {
+  const items = input.items.map((item) => ({ ...item, line_total: lineTotal(item.quantity, item.unit_price) }));
+  const amount = input.amount ?? sumLineTotals(items);
+  if (!amount || amount <= 0) throw new HttpError(400, 'Amount must be more than 0');
+
+  return withTransaction(async (client) => {
+    const { rows } = await client.query(
+      'SELECT status FROM transactions WHERE id = $1 AND shop_id = $2 FOR UPDATE',
+      [id, shopId]
+    );
+    if (rows.length === 0) throw new HttpError(404, 'Transaction not found');
+    if (rows[0].status !== 'draft') throw new HttpError(409, `Only a draft can be edited; this one is ${rows[0].status}`);
+
+    await assertBelongsToShop(client, shopId, input.customer_id, items);
+    await client.query(
+      `UPDATE transactions
+          SET type = $3, customer_id = $4, amount = $5, method = $6, due_date = $7, note = $8
+        WHERE id = $1 AND shop_id = $2`,
+      [id, shopId, input.type, input.customer_id, amount, input.method, input.due_date, input.note]
+    );
+    await client.query('DELETE FROM transaction_items WHERE transaction_id = $1', [id]);
+    for (const item of items) {
+      await client.query(
+        `INSERT INTO transaction_items
+           (transaction_id, product_id, description, quantity, unit_price, line_total)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [id, item.product_id, item.description, item.quantity, item.unit_price, item.line_total]
+      );
+    }
+    return getTransaction(shopId, id, client);
+  });
+}
+
 /** draft -> confirmed. This is the moment an AI suggestion enters the ledger. */
 export async function confirmTransaction(shopId, id) {
   return withTransaction(async (client) => {

@@ -14,6 +14,7 @@ const envSchema = z.object({
   AI_PROVIDER: z.enum(['rules', 'gemini', 'ollama']).default('rules'),
   AI_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
   GEMINI_API_KEY: z.string().optional(),
+  GEMINI_URL: z.string().url().default('https://generativelanguage.googleapis.com/v1beta'),
   LLM_MODEL: z.string().default('gemini-2.5-flash'),
   OLLAMA_URL: z.string().url().default('http://localhost:11434'),
   OLLAMA_MODEL: z.string().default('llama3.2:3b'),

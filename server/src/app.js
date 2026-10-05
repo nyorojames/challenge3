@@ -9,6 +9,7 @@ import productRoutes from './routes/products.js';
 import supplierRoutes from './routes/suppliers.js';
 import transactionRoutes from './routes/transactions.js';
 import reportRoutes from './routes/reports.js';
+import aiRoutes from './routes/ai.js';
 
 // The app is built here and started in server.js, so tests can use it
 // with Supertest without opening a real port.
@@ -31,6 +32,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

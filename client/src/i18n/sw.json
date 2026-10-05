@@ -103,7 +103,9 @@
     "save": "Hifadhi rekodi",
     "saved": "Imehifadhiwa ✓",
     "need_customer": "Chagua mteja",
-    "need_amount": "Weka kiasi au ongeza bidhaa"
+    "need_amount": "Weka kiasi au ongeza bidhaa",
+    "tab_ai": "✨ Andika sentensi",
+    "tab_manual": "📝 Jaza fomu"
   },
   "tx": {
     "cash_sale": "Mauzo taslimu",
@@ -116,5 +118,26 @@
     "cash": "Taslimu",
     "mpesa": "M-Pesa",
     "credit": "Mkopo"
+  },
+  "ai": {
+    "title": "Andika kama unavyoongea",
+    "placeholder": "mf. Mama Wanjiku amechukua sukari 2kg na mafuta, atalipa Ijumaa",
+    "parse": "✨ Soma",
+    "parsing": "Inasoma…",
+    "try": "Jaribu:",
+    "basic_mode": "Hali ya msingi",
+    "basic_mode_hint": "AI haipatikani sasa, nimetumia kanuni rahisi. Kagua kabla ya kuthibitisha.",
+    "confidence": "Uhakika {pct}%",
+    "low_confidence": "Sina uhakika. Tafadhali kagua kila kitu kabla ya kuthibitisha.",
+    "saved_draft": "Imehifadhiwa kama rasimu",
+    "not_saved": "Bado haijahifadhiwa: kamilisha hapa chini",
+    "new_customer": "\"{name}\" si mteja wako bado. Chagua mteja, au umuongeze kama mteja mpya.",
+    "create_customer": "➕ Mteja mpya: {name}",
+    "unknown_item": "{name} (haiko kwenye bidhaa zako)",
+    "unknown_items": "Hazipo kwenye bidhaa zako: {names}. Weka bei au chagua bidhaa.",
+    "notes": "Maelezo: {notes}",
+    "confirm": "Thibitisha",
+    "discard": "Futa",
+    "drafts": "Rasimu {count} zinasubiri"
   }
 }

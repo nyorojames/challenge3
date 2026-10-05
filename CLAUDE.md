@@ -19,7 +19,7 @@ abstractions, explain decisions**.
 - Ask when ambiguous. Never commit secrets (`.env` is gitignored; keep `.env.example` current).
 
 ## Phases
-0 Setup ✅ · 1 Backend core ✅ · 2 Frontend core (built, awaiting approval) · 3 AI entry · 4 Mock M-Pesa + SMS ·
+0 Setup ✅ · 1 Backend core ✅ · 2 Frontend core ✅ · 3 AI entry (built, awaiting approval) · 4 Mock M-Pesa + SMS ·
 5 Offline + demo polish. (Update the ✅ as phases are approved.)
 
 ## Stack
@@ -70,6 +70,10 @@ UUID prefixes: `a…` shop/user, `b…` suppliers, `c…` products, `d…` custo
   `routes/schemas.js`. PATCH routes use `utils/sql.js#updateShopRow`.
 - Errors: `throw new HttpError(status, msg)`; Express 5 forwards async errors to
   `middleware/errors.js` (also maps ZodError → 400, pg 23505 → 409).
+- `providers/ai/`: `index.js#parseEntry` (provider + 5 s timeout + fallback), `rules.js`
+  (extraction), `match.js` (fuzzy match + `groundEntry`: real IDs, catalog prices, amount),
+  `gemini.js`/`ollama.js` (HTTP only), `prompt.txt`. **rules.js, match.js and
+  utils/swahiliDates.js must stay pure** (no config/Node imports): the client reuses them offline in Phase 5.
 - Tests: `tests/helpers.js#createTestShop()` makes an isolated shop + token; clean up after.
 
 ## Code map (client)
@@ -80,4 +84,6 @@ UUID prefixes: `a…` shop/user, `b…` suppliers, `c…` products, `d…` custo
 - `lib/format.js` (KES, dates in Africa/Nairobi), `lib/ids.js#newId()` (client UUIDs).
 - `components/Layout.jsx` (header with SW|EN toggle + bottom nav), `DueBadge`, `TransactionRow`, `Status`.
 - Pages: Login, Dashboard, Customers (`?filter=owing|overdue`), CustomerDetail (void),
-  Products (`?low=1`), NewEntry (`?type=&customer=` prefill).
+  Products (`?low=1`), NewEntry (tabs: AI sentence | form; `?type=&customer=` opens the form).
+- `components/EntryForm.jsx` is shared by manual entry and AI draft review; `AiEntry.jsx`
+  (parse → auto-draft → confirm/discard), `DraftsList.jsx`.

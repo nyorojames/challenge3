@@ -48,7 +48,9 @@ export default function Dashboard() {
       </section>
 
       {s.draft_count > 0 && (
-        <p className="rounded-lg bg-sky-50 p-3 text-sm text-sky-800">{t('dashboard.drafts', { count: s.draft_count })}</p>
+        <Link to="/new" className="block rounded-lg bg-sky-50 p-3 text-sm text-sky-800 ring-1 ring-sky-200">
+          {t('dashboard.drafts', { count: s.draft_count })} →
+        </Link>
       )}
 
       <div className="grid grid-cols-2 gap-3">

@@ -142,3 +142,43 @@ describe('ledger safety', () => {
     }
   });
 });
+
+describe('AI drafts', () => {
+  it('parse -> draft (not in balance) -> edit -> confirm -> no more edits', async () => {
+    const id = await newCustomer('Mama Zawadi');
+    // (the shop already has sukari at 160/kg from the stock test above)
+
+    // 1. Parse: only a suggestion, nothing is written.
+    const parsed = await api().post('/api/ai/parse', { text: 'Mama Zawadi amechukua sukari 2kg, atalipa Ijumaa' });
+    expect(parsed.status).toBe(200);
+    expect(parsed.body).toMatchObject({ basic_mode: true, raw_input: 'Mama Zawadi amechukua sukari 2kg, atalipa Ijumaa' });
+    const { entry } = parsed.body;
+    expect(entry).toMatchObject({ type: 'credit_sale', amount: 320 });
+    expect(entry.customer_id).toBeTruthy();
+
+    // 2. Save as a draft (what the review screen does).
+    const draft = await record({
+      type: entry.type, customer_id: entry.customer_id, due_date: entry.due_date, source: 'ai', raw_input: parsed.body.raw_input,
+      items: entry.items.map((i) => ({ product_id: i.product_id, description: i.name, quantity: i.quantity, unit_price: i.unit_price })),
+    });
+    expect(draft.status).toBe('draft');
+    expect((await customer(id)).balance).toBe(0);
+
+    // 3. The shopkeeper corrects the quantity to 3 kg.
+    const edited = await request(app).put(`/api/transactions/${draft.id}`).set('Authorization', shop.auth).send({
+      type: 'credit_sale', customer_id: id, due_date: entry.due_date,
+      items: [{ product_id: entry.items[0].product_id, description: 'sukari', quantity: 3, unit_price: 160 }],
+    });
+    expect(edited.status).toBe(200);
+    expect(edited.body).toMatchObject({ amount: 480, status: 'draft', source: 'ai', raw_input: parsed.body.raw_input });
+
+    // 4. Confirm: now it counts.
+    await api().post(`/api/transactions/${draft.id}/confirm`);
+    expect((await customer(id)).balance).toBe(480);
+
+    // 5. A confirmed entry can only be voided, never edited.
+    const late = await request(app).put(`/api/transactions/${draft.id}`).set('Authorization', shop.auth)
+      .send({ type: 'credit_sale', customer_id: id, amount: 1 });
+    expect(late.status).toBe(409);
+  });
+});

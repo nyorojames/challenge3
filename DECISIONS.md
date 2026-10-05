@@ -102,3 +102,43 @@ Short notes on the important choices and why. Newest phase at the bottom.
   new balance is the first thing you see (good for the demo).
 - **Mobile-first layout:** max width ~670px, bottom tab bar, big tap targets.
   Verified at 390×844 (a phone) with a Playwright script.
+
+## Phase 3 — AI entry (the "Rational clone")
+
+- **Every provider goes extract → validate (zod) → ground.** The LLM or rules parser
+  only says what the sentence means. `groundEntry` (match.js) then maps names to real
+  customer/product IDs, applies OUR price list and computes the amount. An LLM cannot
+  invent an ID, a price or a customer; there is a test with an invented ID.
+- **Fallback is one try/catch in `providers/ai/index.js`.** Error, HTTP 429/404,
+  >5 s (`AbortSignal.timeout`), non-JSON, wrong shape or a dropped connection all
+  lead to the rules parser plus `basic_mode: true`. Tested against a fake local Gemini/Ollama
+  server that misbehaves on purpose (no internet needed for the tests).
+- **The rules parser and `match.js` are pure (no config, no Node APIs)**, so the
+  browser can run them offline in Phase 5.
+- **Rules parser design:** find the first verb (amechukua/took → credit, amelipa/paid →
+  payment, nimeuza/sold → cash sale, nimelipa/spent → expense, nimenunua/bought →
+  restock). Text before the verb = the customer. "paid" with nobody before it = the shop
+  paying = expense. After the verb: due-date clause ("atalipa …"), method words, total
+  ("kwa 300"), then items split on na/and/commas, plus run-on items ("sukari 2kg mafuta 1").
+- **Localization in the parser:** Swahili number words (mbili, nusu), Sheng money (soo
+  tatu = 300, thao = 1000), Swahili weekdays, kesho/keshokutwa/wiki ijayo/mwisho wa
+  mwezi/tarehe 15, plurals (mikate → mkate), English synonyms (sugar → sukari),
+  "mafuta ya taa" = paraffin (longest product name wins over "mafuta").
+- **Fuzzy customer matching ignores titles** (Mama/Baba/Mzee) unless the title is the only
+  word, and uses edit distance for typos ("Wanjku"). **Two equally good matches = no
+  guess**: the shopkeeper picks. Below 0.8 similarity = a new customer.
+- **A weekday means the NEXT one** ("atalipa Ijumaa" said on a Friday = next Friday).
+- **Grounding caps confidence:** unknown item ≤ 0.5, missing customer ≤ 0.6,
+  no amount ≤ 0.4. The rules parser reports 0.7 at best (it is honest about being basic).
+- **Draft flow:** `/api/ai/parse` never writes. If the result is complete, the client saves
+  it right away as a draft (`source: 'ai'`, `raw_input` kept). Otherwise (new customer,
+  unpriced item) it is saved when the shopkeeper confirms. Confirm = PUT the edits →
+  POST confirm. Discard = void. Unfinished drafts are listed and linked from the dashboard.
+- **`PUT /api/transactions/:id` edits drafts only** (409 once confirmed). Same zod rules
+  as create; items are replaced; no stock change (drafts never moved stock).
+- **The review screen IS the manual form** (`EntryForm`, pre-filled), so manual and AI
+  entries go through exactly the same fields and checks.
+- **Gemini key goes in the `x-goog-api-key` header, not `?key=`**, so it never appears in logged URLs.
+- **The prompt asks for `unit_price: null` on sales**: prices always come from the database.
+- **`basic_mode` is shown whenever the rules parser answered**, both when chosen in .env and as a fallback.
+  The badge's tooltip gives the reason ("ollama: could not connect").

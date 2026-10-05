@@ -7,6 +7,7 @@ import {
   confirmTransaction,
   getTransaction,
   listTransactions,
+  updateDraft,
   voidTransaction,
 } from '../services/ledger.js';
 import { dateSchema, shillingsSchema, uuidSchema } from './schemas.js';
@@ -81,6 +82,14 @@ router.get('/:id', async (req, res) => {
 router.post('/', validateBody(transactionSchema), async (req, res) => {
   const { transaction, created } = await createTransaction(req.user.shopId, req.user.id, req.body);
   res.status(created ? 201 : 200).json(transaction);
+});
+
+// Edit a draft (e.g. the shopkeeper corrects what the AI understood).
+// Same rules as creating one; the id comes from the URL.
+router.put('/:id', async (req, res) => {
+  const id = uuidSchema.parse(req.params.id);
+  const input = transactionSchema.parse({ ...req.body, id });
+  res.json(await updateDraft(req.user.shopId, id, input));
 });
 
 router.post('/:id/confirm', async (req, res) => {
