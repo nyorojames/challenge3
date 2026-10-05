@@ -19,8 +19,8 @@ abstractions, explain decisions**.
 - Ask when ambiguous. Never commit secrets (`.env` is gitignored; keep `.env.example` current).
 
 ## Phases
-0 Setup ✅ · 1 Backend core · 2 Frontend core · 3 AI entry · 4 Mock M-Pesa + SMS ·
-5 Offline + demo polish. (Update the ✅ as phases are approved.)
+0 Setup ✅ · 1 Backend core ✅ · 2 Frontend core ✅ · 3 AI entry ✅ · 4 Mock M-Pesa + SMS ✅ ·
+5 Offline + demo polish (built, awaiting approval). (Update the ✅ as phases are approved.)
 
 ## Stack
 - `server/`: Node 22, Express 5, ES modules, `pg` with **plain SQL (no ORM)**, zod,
@@ -62,3 +62,44 @@ UUID prefixes: `a…` shop/user, `b…` suppliers, `c…` products, `d…` custo
 - Mzee Kamau 1020 (partial M-Pesa), Akinyi 0 (paid), Mwalimu Njoroge 285 (+ a void
   2850 typo), Kevo 185 (AI entry, no due date), Chebet 365 (due today), Fatuma 0.
 - Low stock: maziwa, mkate. One `unmatched` M-Pesa payment from 254700999888.
+
+## Code map (server)
+- `services/ledger.js` — FIFO `computeDueStatus`, `getCustomerSummaries`, create/confirm/void
+  transactions (stock effects, idempotency). Business rules go here, not in routes.
+- `routes/*.js` — thin: zod-validate, call SQL/service, return JSON. Shared zod pieces in
+  `routes/schemas.js`. PATCH routes use `utils/sql.js#updateShopRow`.
+- Errors: `throw new HttpError(status, msg)`; Express 5 forwards async errors to
+  `middleware/errors.js` (also maps ZodError → 400, pg 23505 → 409).
+- `providers/ai/`: `index.js#parseEntry` (provider + 5 s timeout + fallback), `rules.js`
+  (extraction), `match.js` (fuzzy match + `groundEntry`: real IDs, catalog prices, amount),
+  `gemini.js`/`ollama.js` (HTTP only), `prompt.txt`. **rules.js, match.js and
+  utils/swahiliDates.js must stay pure** (no config/Node imports): the client reuses them offline in Phase 5.
+- `services/mpesa.js` — `requestPayment` (STK push → pending row), `handleStkCallback`
+  (REAL Daraja callback handler: FOR UPDATE + pending-only = idempotent; match by paying
+  phone; unmatched parks money), `assignUnmatched`. `providers/payments/mock.js` makes
+  Daraja-shaped responses/callbacks. `POST /api/mpesa/callback` is mounted BEFORE requireAuth.
+- `services/reminders.js` — SMS text in the shop's language (≤160 chars), remind one /
+  all overdue (20 h anti-spam). `providers/sms/mock.js` writes to `sms_messages`.
+- `services/sync.js` + `POST /api/sync` — batch of `{transaction, confirm}` from the offline
+  outbox; per item saved/duplicate/rejected; `confirm` replays an offline AI confirmation.
+  `transactionSchema` lives in `routes/schemas.js` (shared by transactions + sync).
+- Tests: `tests/helpers.js#createTestShop()` makes an isolated shop + token; clean up after.
+
+## Code map (client)
+- `api/client.js` — `api(path, {method, body})` fetch wrapper (token, ApiError, 401 → logout event).
+  `api/useApi.js` — `{data, error, loading, reload}` for GETs.
+- `session.jsx` — login/logout, caches `{user, shop}`; `i18n/index.jsx` — `useT()` → `{t, lang, setLang}`.
+  **Every UI string goes in both `sw.json` and `en.json`.**
+- `lib/format.js` (KES, dates in Africa/Nairobi), `lib/ids.js#newId()` (client UUIDs).
+- `components/Layout.jsx` (header with SW|EN toggle + bottom nav), `DueBadge`, `TransactionRow`, `Status`.
+- Pages: Login, Dashboard, Customers (`?filter=owing|overdue`), CustomerDetail (void),
+  Products (`?low=1`), NewEntry (tabs: AI sentence | form; `?type=&customer=` opens the form).
+- `components/EntryForm.jsx` is shared by manual entry and AI draft review; `AiEntry.jsx`
+  (parse → auto-draft → confirm/discard), `DraftsList.jsx`.
+- Offline: `db/index.js` (Dexie: `outbox`, `cache`), `sync/connectivity.js` (`isOnline`,
+  `useOnline`: navigator.onLine AND API reachable), `sync/outbox.js` (`saveOrQueue`,
+  `syncOutbox`, `startAutoSync`, `useOutbox`), `lib/offlineParse.js` (server rules.js via the
+  `@server-ai` Vite alias). `useApi` caches every GET and serves it offline (`stale`).
+  `ConnectionBadge` (header), `PendingList` (dashboard). M-Pesa/SMS/void are online-only.
+- `components/PhoneSimulator.jsx` (amount → STK prompt with PIN → confirmation), pages
+  `Mpesa.jsx` (unmatched assign, walk-in request, dev "resend last callback"), `SmsOutbox.jsx`.
