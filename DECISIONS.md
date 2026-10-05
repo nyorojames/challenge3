@@ -32,3 +32,44 @@ Short notes on the important choices and why. Newest phase at the bottom.
   Otieno would wrongly show as overdue). Payments cover the oldest credit sales first.
   Overdue = the due date of the oldest sale not yet fully covered is in the past AND
   balance > 0.
+
+## Phase 1 — Backend core
+
+- **Business rules live in `services/ledger.js`; routes stay thin.** A route validates
+  input, calls SQL or the service, and returns JSON. FIFO, stock and the write paths can
+  be read and tested in one place.
+- **FIFO overdue is a pure function, `computeDueStatus(sales, totalPaid, today)`.** It
+  takes plain data and returns plain data, so it is unit-tested without a database.
+  Balance still comes from the `customer_balances` view, as required.
+- **Refinement to the agreed rule: among the credit sales not yet covered, take the
+  earliest due date.** This is the same as "the oldest uncovered sale's due date"
+  except in one case: an older sale with no due date would otherwise hide a newer one
+  that is past due. There is a test for this case.
+- **"Today" is computed in Kenya time (`Intl` with `Africa/Nairobi`).** "Due today" is
+  not overdue; it becomes overdue tomorrow.
+- **pg type parsers:** DATE is kept as a `'YYYY-MM-DD'` string (the default JS Date
+  can move a due date by a day), and BIGINT from SUM/COUNT becomes a Number.
+- **`amount` is optional when items are sent (it becomes the sum of the line totals),
+  but a given amount wins.** This allows a discounted price ("nimeuza kwa 300").
+  Line totals are rounded once to whole shillings in `utils/money.js`.
+- **Idempotent create: `INSERT … ON CONFLICT (id) DO NOTHING`, and stock moves only
+  when the row was really inserted.** A retry returns 200 with the existing row; a new
+  row returns 201. If the id belongs to another shop, the server returns 409 and leaks nothing.
+- **The server forces `source: 'ai'` entries to `status: 'draft'`.** The rule "AI never
+  writes to the ledger" holds even if a client sends the wrong status. Clients cannot
+  claim `source: 'mpesa'`; only the M-Pesa callback can use it.
+- **Stock moves only for confirmed transactions.** Sales subtract, restocks add, and voiding a
+  confirmed entry reverses it. Drafts don't move stock until they are confirmed. Stock
+  is allowed to go negative: a real sale must never be blocked because a restock wasn't recorded.
+- **Mistakes are voided, never deleted.** History stays honest, and the customer page
+  shows voided rows crossed out.
+- **Customer and product IDs in a transaction are checked against the shop.** Without
+  this, a user could put another shop's customer in their own ledger.
+- **Simple profit = sales (cash + M-Pesa + credit) − expenses.** Payments are not
+  counted (that would double count credit sales). Restock is shown separately as
+  "stock bought" because it swaps cash for goods. Real margin needs cost prices (future work).
+- **Draft editing is deferred to Phase 3**, where the confirm screen decides its exact shape.
+- **Tests use the dev database inside a throwaway shop** that is deleted afterwards
+  (`ON DELETE CASCADE`). No second database to set up before the deadline.
+- **Zod stays on v3.** Zod 4's `.uuid()` only accepts RFC-versioned UUIDs and would
+  reject our readable seed IDs such as `a0000000-…-0001`.

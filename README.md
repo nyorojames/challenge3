@@ -8,7 +8,7 @@ working offline.
 A localized clone of **Rational** (YC Summer 2026), "an
 accounting firm run entirely by AI employees".
 
-> 🚧 Work in progress. Phase 0 (setup) is done. The demo script and full docs come in Phase 5.
+> 🚧 Work in progress. Phases 0–1 (setup, backend API) are done. The demo script and full docs come in Phase 5.
 
 ## Demo login
 
@@ -66,7 +66,40 @@ cd client
 npm install
 ```
 
-(The API server and the React app are built in Phases 1 and 2.)
+(The React app is built in Phase 2.)
+
+## 4. Run the API and tests
+
+```bash
+cd server
+npm run dev       # http://localhost:4000/api/health
+npm test          # needs the database running; tests use a throwaway shop
+```
+
+### API overview
+
+All routes except `/api/auth/*` and `/api/health` need `Authorization: Bearer <token>`.
+
+| Method | Path | What it does |
+|---|---|---|
+| POST | `/api/auth/login` | `{ phone, password }` → `{ token, user, shop }` |
+| POST | `/api/auth/register` | create a shop and its owner |
+| GET | `/api/auth/me` | current user and shop |
+| GET/POST | `/api/customers` | list with `balance`, `due_date`, `overdue` (`?overdue=true`) / create |
+| GET/PATCH | `/api/customers/:id` | detail with full `history` / edit |
+| GET/POST/PATCH | `/api/products` | `low_stock` flag (`?low_stock=true`) |
+| GET/POST/PATCH | `/api/suppliers` | |
+| GET/POST | `/api/transactions` | filters: `customer_id, type, status, from, to, limit`. POST takes a client UUID |
+| POST | `/api/transactions/:id/confirm` | draft → confirmed (moves stock) |
+| POST | `/api/transactions/:id/void` | → void (reverses stock) |
+| GET | `/api/reports/summary?date=` | dashboard numbers for a Kenyan day |
+
+Try it:
+
+```bash
+curl -s -X POST localhost:4000/api/auth/login -H 'content-type: application/json' \
+  -d '{"phone":"0712345678","password":"duka1234"}'
+```
 
 ## Project layout
 

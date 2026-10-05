@@ -19,7 +19,7 @@ abstractions, explain decisions**.
 - Ask when ambiguous. Never commit secrets (`.env` is gitignored; keep `.env.example` current).
 
 ## Phases
-0 Setup ✅ · 1 Backend core · 2 Frontend core · 3 AI entry · 4 Mock M-Pesa + SMS ·
+0 Setup ✅ · 1 Backend core (built, awaiting approval) · 2 Frontend core · 3 AI entry · 4 Mock M-Pesa + SMS ·
 5 Offline + demo polish. (Update the ✅ as phases are approved.)
 
 ## Stack
@@ -62,3 +62,12 @@ UUID prefixes: `a…` shop/user, `b…` suppliers, `c…` products, `d…` custo
 - Mzee Kamau 1020 (partial M-Pesa), Akinyi 0 (paid), Mwalimu Njoroge 285 (+ a void
   2850 typo), Kevo 185 (AI entry, no due date), Chebet 365 (due today), Fatuma 0.
 - Low stock: maziwa, mkate. One `unmatched` M-Pesa payment from 254700999888.
+
+## Code map (server)
+- `services/ledger.js` — FIFO `computeDueStatus`, `getCustomerSummaries`, create/confirm/void
+  transactions (stock effects, idempotency). Business rules go here, not in routes.
+- `routes/*.js` — thin: zod-validate, call SQL/service, return JSON. Shared zod pieces in
+  `routes/schemas.js`. PATCH routes use `utils/sql.js#updateShopRow`.
+- Errors: `throw new HttpError(status, msg)`; Express 5 forwards async errors to
+  `middleware/errors.js` (also maps ZodError → 400, pg 23505 → 409).
+- Tests: `tests/helpers.js#createTestShop()` makes an isolated shop + token; clean up after.
