@@ -1,0 +1,29 @@
+# Local PostgreSQL for Duka Ledger.
+#   docker compose up -d     -> starts Postgres; on FIRST start it runs schema.sql then seed.sql
+#   docker compose down -v   -> stops it AND deletes the data (next start re-seeds)
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: duka-ledger-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: duka
+      POSTGRES_PASSWORD: duka
+      POSTGRES_DB: duka_ledger
+      TZ: Africa/Nairobi
+      PGTZ: Africa/Nairobi
+    ports:
+      - "5432:5432"
+    volumes:
+      - duka_pgdata:/var/lib/postgresql/data
+      # Files here run in alphabetical order, only when the data volume is empty.
+      - ./server/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./server/db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U duka -d duka_ledger"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  duka_pgdata:

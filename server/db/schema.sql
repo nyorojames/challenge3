@@ -100,7 +100,20 @@ CREATE TABLE mpesa_payments (
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 6. Customer balances are calculated, never stored
+-- 6. SMS: every message the shop sends (mock provider writes here)
+CREATE TABLE sms_messages (
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    shop_id      UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
+    customer_id  UUID REFERENCES customers(id) ON DELETE SET NULL,
+    phone        TEXT NOT NULL,
+    body         TEXT NOT NULL,
+    purpose      TEXT NOT NULL DEFAULT 'reminder',
+    status       TEXT NOT NULL DEFAULT 'sent',
+    provider     TEXT NOT NULL DEFAULT 'mock',
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 7. Customer balances are calculated, never stored
 CREATE VIEW customer_balances AS
 SELECT
     c.id   AS customer_id,
