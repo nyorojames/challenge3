@@ -8,7 +8,7 @@ working offline.
 A localized clone of **Rational** (YC Summer 2026), "an
 accounting firm run entirely by AI employees".
 
-> 🚧 Work in progress. Phases 0–1 (setup, backend API) are done. The demo script and full docs come in Phase 5.
+> 🚧 Work in progress. Phases 0–2 (setup, backend API, frontend core) are done. The demo script and full docs come in Phase 5.
 
 ## Demo login
 
@@ -64,9 +64,12 @@ run when `NODE_ENV=production`.
 ```bash
 cd client
 npm install
+npm run dev       # http://localhost:5173  (the API must be running on :4000)
 ```
 
-(The React app is built in Phase 2.)
+Vite forwards every `/api/...` request to the Express server, so start both:
+one terminal with `cd server && npm run dev`, another with `cd client && npm run dev`.
+Open the app on your phone over Wi-Fi with `npm run dev -- --host` and the laptop's IP.
 
 ## 4. Run the API and tests
 

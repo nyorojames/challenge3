@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#047857"/>
+  <path d="M14 26 L18 14 H46 L50 26 Z" fill="#fbbf24"/>
+  <rect x="16" y="26" width="32" height="24" rx="2" fill="#ecfdf5"/>
+  <rect x="27" y="36" width="10" height="14" fill="#047857"/>
+  <text x="32" y="23" font-family="Arial" font-size="9" font-weight="bold" text-anchor="middle" fill="#064e3b">KES</text>
+</svg>

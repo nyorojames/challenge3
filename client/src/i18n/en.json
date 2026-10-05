@@ -1,0 +1,120 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "search": "Search…",
+    "logout": "Log out",
+    "add": "Add",
+    "remove": "Remove",
+    "optional": "optional",
+    "language": "Language"
+  },
+  "nav": {
+    "dashboard": "Today",
+    "customers": "Customers",
+    "new": "New entry",
+    "products": "Products"
+  },
+  "login": {
+    "title": "Log in to your shop",
+    "subtitle": "Your AI bookkeeper",
+    "phone": "Phone number",
+    "password": "Password",
+    "submit": "Log in",
+    "demo": "Demo: 0712345678 / duka1234"
+  },
+  "dashboard": {
+    "sales_today": "Today's sales",
+    "owed": "Owed by customers",
+    "owed_sub": "{count} customers owe",
+    "overdue": "Overdue debts",
+    "overdue_sub": "{count} customers overdue",
+    "expenses": "Today's expenses",
+    "profit": "Today's profit",
+    "profit_hint": "Sales − expenses",
+    "low_stock": "Low-stock products",
+    "low_stock_sub": "Time to reorder",
+    "drafts": "{count} drafts waiting for confirmation",
+    "payments": "Debt payments today",
+    "stock_bought": "Stock bought today",
+    "recent": "Recent entries",
+    "empty": "No entries yet",
+    "new_entry": "+ New entry"
+  },
+  "customers": {
+    "title": "Customers",
+    "all": "All",
+    "owing": "Owing",
+    "overdue": "Overdue",
+    "add": "+ New customer",
+    "name": "Name",
+    "phone": "Phone",
+    "empty": "No customers here",
+    "no_debt": "No debt",
+    "due_on": "Due {date}",
+    "due_today": "Due today",
+    "no_due_date": "No due date",
+    "days_overdue": "{days} days overdue"
+  },
+  "customer": {
+    "back": "← Customers",
+    "balance": "Balance",
+    "credit_limit": "Credit limit",
+    "history": "History",
+    "history_empty": "No history yet",
+    "record_payment": "Record payment",
+    "new_credit": "New credit sale",
+    "void": "Void",
+    "void_confirm": "Void this entry? It stays in the history, marked as void.",
+    "voided": "Void",
+    "draft": "Draft",
+    "not_found": "Customer not found"
+  },
+  "products": {
+    "title": "Products",
+    "low": "Low stock",
+    "left": "{qty} {unit} left",
+    "reorder_at": "Reorder at {level}",
+    "per_unit": "per {unit}",
+    "restock": "+ Restock",
+    "only_low": "Low stock only"
+  },
+  "entry": {
+    "title": "New entry",
+    "customer": "Customer",
+    "choose_customer": "Choose a customer…",
+    "items": "Items",
+    "choose_product": "Choose a product…",
+    "add_item": "+ Add item",
+    "qty": "Qty",
+    "price": "Price",
+    "cost": "Cost price",
+    "items_total": "Items total",
+    "total_override": "Different total? (discount)",
+    "amount": "Amount (KES)",
+    "method": "Paid by",
+    "due_date": "Due date",
+    "note": "Note",
+    "note_expense": "e.g. transport, electricity, rent",
+    "save": "Save entry",
+    "saved": "Saved ✓",
+    "need_customer": "Choose a customer",
+    "need_amount": "Enter an amount or add items"
+  },
+  "tx": {
+    "cash_sale": "Cash sale",
+    "credit_sale": "Credit sale",
+    "payment": "Debt payment",
+    "expense": "Expense",
+    "restock": "Restock"
+  },
+  "method": {
+    "cash": "Cash",
+    "mpesa": "M-Pesa",
+    "credit": "Credit"
+  }
+}

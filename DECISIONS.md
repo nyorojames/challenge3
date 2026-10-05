@@ -73,3 +73,32 @@ Short notes on the important choices and why. Newest phase at the bottom.
   (`ON DELETE CASCADE`). No second database to set up before the deadline.
 - **Zod stays on v3.** Zod 4's `.uuid()` only accepts RFC-versioned UUIDs and would
   reject our readable seed IDs such as `a0000000-…-0001`.
+
+## Phase 2 — Frontend core
+
+- **Vite proxies `/api` to Express** (dev and preview), so the client only calls
+  relative URLs. There is no CORS to configure, and the same build works when served
+  from the API's own origin.
+- **No i18n library.** `sw.json` + `en.json` and a ~30-line `useT()` hook with `{name}`
+  placeholders. A missing word falls back to English, then to the key, so it is easy to spot.
+- **Language: Swahili by default; on the first login on a device it follows the shop's
+  `language`.** After that, the user's last SW | EN choice is remembered, so switching
+  to English for the presentation sticks across reloads.
+- **SW | EN switch sits in the header on every page and on the login screen.**
+- **No state library (Redux, React Query).** A tiny `useApi(path)` hook loads data and
+  `reload()` refreshes it after a change. The server recalculates balances, so the
+  client never does money math except to preview a form total.
+- **Token and user/shop cached in `localStorage`.** A refresh, and later offline use,
+  keeps you logged in. Trade-off: a script injected into the page (XSS) could read the
+  token. Acceptable for a demo; an httpOnly cookie is the production answer.
+- **A 401 from the API fires a `duka:session-expired` event and the app returns to login.**
+- **Transaction IDs come from `lib/ids.js#newId()`.** `crypto.randomUUID()` only exists on
+  https/localhost. If the app is opened on a phone via the laptop's Wi-Fi IP, it falls back
+  to building a v4 UUID from `crypto.getRandomValues`.
+- **One NewEntry form for all 5 types**; it shows only the fields a type needs (mirrors
+  the server zod rules). Item price defaults to the selling price; for a restock it is
+  left empty for the supplier cost. A "different total" field allows discounts.
+- **After saving a credit sale or payment, the app opens that customer's page**, so the
+  new balance is the first thing you see (good for the demo).
+- **Mobile-first layout:** max width ~670px, bottom tab bar, big tap targets.
+  Verified at 390×844 (a phone) with a Playwright script.

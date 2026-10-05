@@ -19,7 +19,7 @@ abstractions, explain decisions**.
 - Ask when ambiguous. Never commit secrets (`.env` is gitignored; keep `.env.example` current).
 
 ## Phases
-0 Setup ✅ · 1 Backend core (built, awaiting approval) · 2 Frontend core · 3 AI entry · 4 Mock M-Pesa + SMS ·
+0 Setup ✅ · 1 Backend core ✅ · 2 Frontend core (built, awaiting approval) · 3 AI entry · 4 Mock M-Pesa + SMS ·
 5 Offline + demo polish. (Update the ✅ as phases are approved.)
 
 ## Stack
@@ -71,3 +71,13 @@ UUID prefixes: `a…` shop/user, `b…` suppliers, `c…` products, `d…` custo
 - Errors: `throw new HttpError(status, msg)`; Express 5 forwards async errors to
   `middleware/errors.js` (also maps ZodError → 400, pg 23505 → 409).
 - Tests: `tests/helpers.js#createTestShop()` makes an isolated shop + token; clean up after.
+
+## Code map (client)
+- `api/client.js` — `api(path, {method, body})` fetch wrapper (token, ApiError, 401 → logout event).
+  `api/useApi.js` — `{data, error, loading, reload}` for GETs.
+- `session.jsx` — login/logout, caches `{user, shop}`; `i18n/index.jsx` — `useT()` → `{t, lang, setLang}`.
+  **Every UI string goes in both `sw.json` and `en.json`.**
+- `lib/format.js` (KES, dates in Africa/Nairobi), `lib/ids.js#newId()` (client UUIDs).
+- `components/Layout.jsx` (header with SW|EN toggle + bottom nav), `DueBadge`, `TransactionRow`, `Status`.
+- Pages: Login, Dashboard, Customers (`?filter=owing|overdue`), CustomerDetail (void),
+  Products (`?low=1`), NewEntry (`?type=&customer=` prefill).

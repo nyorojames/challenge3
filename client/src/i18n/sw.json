@@ -1,0 +1,120 @@
+{
+  "common": {
+    "loading": "Inapakia…",
+    "error": "Kuna hitilafu",
+    "retry": "Jaribu tena",
+    "save": "Hifadhi",
+    "saving": "Inahifadhi…",
+    "cancel": "Ghairi",
+    "search": "Tafuta…",
+    "logout": "Toka",
+    "add": "Ongeza",
+    "remove": "Ondoa",
+    "optional": "si lazima",
+    "language": "Lugha"
+  },
+  "nav": {
+    "dashboard": "Leo",
+    "customers": "Wateja",
+    "new": "Rekodi",
+    "products": "Bidhaa"
+  },
+  "login": {
+    "title": "Ingia kwenye duka lako",
+    "subtitle": "Mhasibu wako wa AI",
+    "phone": "Namba ya simu",
+    "password": "Nenosiri",
+    "submit": "Ingia",
+    "demo": "Demo: 0712345678 / duka1234"
+  },
+  "dashboard": {
+    "sales_today": "Mauzo ya leo",
+    "owed": "Deni la wateja",
+    "owed_sub": "Wateja {count} wanadaiwa",
+    "overdue": "Madeni yaliyochelewa",
+    "overdue_sub": "Wateja {count} wamechelewa",
+    "expenses": "Matumizi ya leo",
+    "profit": "Faida ya leo",
+    "profit_hint": "Mauzo − matumizi",
+    "low_stock": "Bidhaa zinazoisha",
+    "low_stock_sub": "Agiza mzigo",
+    "drafts": "Rasimu {count} zinasubiri uthibitisho",
+    "payments": "Malipo ya madeni leo",
+    "stock_bought": "Mzigo ulionunuliwa leo",
+    "recent": "Rekodi za karibuni",
+    "empty": "Hakuna rekodi bado",
+    "new_entry": "+ Rekodi mpya"
+  },
+  "customers": {
+    "title": "Wateja",
+    "all": "Wote",
+    "owing": "Wanadaiwa",
+    "overdue": "Wamechelewa",
+    "add": "+ Mteja mpya",
+    "name": "Jina",
+    "phone": "Simu",
+    "empty": "Hakuna wateja hapa",
+    "no_debt": "Hana deni",
+    "due_on": "Alipe {date}",
+    "due_today": "Alipe leo",
+    "no_due_date": "Hakuna tarehe",
+    "days_overdue": "Amechelewa siku {days}"
+  },
+  "customer": {
+    "back": "← Wateja",
+    "balance": "Deni",
+    "credit_limit": "Kikomo cha mkopo",
+    "history": "Historia",
+    "history_empty": "Hakuna historia bado",
+    "record_payment": "Pokea malipo",
+    "new_credit": "Mkopo mpya",
+    "void": "Futa",
+    "void_confirm": "Futa rekodi hii? Itabaki kwenye historia ikionyesha imefutwa.",
+    "voided": "Imefutwa",
+    "draft": "Rasimu",
+    "not_found": "Mteja hakupatikana"
+  },
+  "products": {
+    "title": "Bidhaa",
+    "low": "Inaisha",
+    "left": "{qty} {unit} zimebaki",
+    "reorder_at": "Agiza ikifika {level}",
+    "per_unit": "kwa {unit}",
+    "restock": "+ Ongeza mzigo",
+    "only_low": "Zinazoisha tu"
+  },
+  "entry": {
+    "title": "Rekodi mpya",
+    "customer": "Mteja",
+    "choose_customer": "Chagua mteja…",
+    "items": "Bidhaa",
+    "choose_product": "Chagua bidhaa…",
+    "add_item": "+ Ongeza bidhaa",
+    "qty": "Idadi",
+    "price": "Bei",
+    "cost": "Bei ya kununua",
+    "items_total": "Jumla ya bidhaa",
+    "total_override": "Jumla tofauti? (punguzo)",
+    "amount": "Kiasi (KES)",
+    "method": "Amelipa kwa",
+    "due_date": "Atalipa lini?",
+    "note": "Maelezo",
+    "note_expense": "mf. nauli, stima, kodi",
+    "save": "Hifadhi rekodi",
+    "saved": "Imehifadhiwa ✓",
+    "need_customer": "Chagua mteja",
+    "need_amount": "Weka kiasi au ongeza bidhaa"
+  },
+  "tx": {
+    "cash_sale": "Mauzo taslimu",
+    "credit_sale": "Mkopo",
+    "payment": "Malipo ya deni",
+    "expense": "Matumizi",
+    "restock": "Kununua mzigo"
+  },
+  "method": {
+    "cash": "Taslimu",
+    "mpesa": "M-Pesa",
+    "credit": "Mkopo"
+  }
+}
