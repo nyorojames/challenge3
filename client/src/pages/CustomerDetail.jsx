@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useApi } from '../api/useApi.js';
@@ -6,11 +7,23 @@ import { formatKES } from '../lib/format.js';
 import { ErrorBox, Loading } from '../components/Status.jsx';
 import DueBadge from '../components/DueBadge.jsx';
 import TransactionRow from '../components/TransactionRow.jsx';
+import PhoneSimulator from '../components/PhoneSimulator.jsx';
 
 export default function CustomerDetail() {
   const { id } = useParams();
   const { t } = useT();
   const { data: customer, error, loading, reload } = useApi(`/customers/${id}`);
+  const [payingByMpesa, setPayingByMpesa] = useState(false);
+  const [smsNotice, setSmsNotice] = useState(null);
+
+  const remind = async () => {
+    try {
+      const message = await api(`/sms/remind/${id}`, { method: 'POST' });
+      setSmsNotice({ ok: true, text: message.body });
+    } catch (err) {
+      setSmsNotice({ ok: false, text: err.message });
+    }
+  };
 
   const voidEntry = async (tx) => {
     if (!window.confirm(t('customer.void_confirm'))) return;
@@ -44,7 +57,24 @@ export default function CustomerDetail() {
         </div>
       </section>
 
-      {/* Remind (SMS) and M-Pesa request buttons are added in Phase 4. */}
+      {customer.phone && customer.balance > 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={() => setPayingByMpesa(true)} className="rounded-lg bg-green-600 py-2.5 font-semibold text-white">
+            {t('customer.request_mpesa')}
+          </button>
+          <button onClick={remind} className="rounded-lg bg-white py-2.5 font-semibold text-slate-700 ring-1 ring-slate-300">
+            {t('customer.remind')}
+          </button>
+        </div>
+      )}
+      {smsNotice && (
+        <p className={`rounded-lg p-3 text-sm ${smsNotice.ok ? 'bg-green-50 text-green-900' : 'bg-red-50 text-red-700'}`}>
+          {smsNotice.ok && <strong>{t('customer.reminded')} </strong>}
+          {smsNotice.text}
+          {smsNotice.ok && <Link to="/sms" className="ml-1 font-semibold underline">{t('sms.open_outbox')}</Link>}
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-2">
         <Link
           to={`/new?type=payment&customer=${customer.id}`}
@@ -59,6 +89,15 @@ export default function CustomerDetail() {
           {t('customer.new_credit')}
         </Link>
       </div>
+
+      {payingByMpesa && (
+        <PhoneSimulator
+          customerId={customer.id}
+          defaultAmount={customer.balance}
+          onPaid={reload} // the server already lowered the balance; just refresh
+          onClose={() => { setPayingByMpesa(false); reload(); }}
+        />
+      )}
 
       <section className="rounded-xl border border-slate-200 bg-white px-4 shadow-sm">
         <h3 className="pt-3 font-semibold text-slate-700">{t('customer.history')}</h3>

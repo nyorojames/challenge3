@@ -55,10 +55,21 @@ export default function Customers() {
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [adding, setAdding] = useState(false);
+  const [reminderResult, setReminderResult] = useState(null);
   const filter = FILTERS[params.get('filter')] ? params.get('filter') : 'all';
 
   if (loading && !data) return <Loading />;
   if (error) return <ErrorBox error={error} onRetry={reload} />;
+
+  const remindAllOverdue = async () => {
+    try {
+      const { sent, skipped } = await api('/sms/remind-overdue', { method: 'POST' });
+      setReminderResult({ ok: true, text: t('sms.bulk_result', { sent: sent.length, skipped: skipped.length }) });
+    } catch (err) {
+      setReminderResult({ ok: false, text: err.message });
+    }
+  };
+  const overdueCount = data.filter(FILTERS.overdue).length;
 
   const needle = search.trim().toLowerCase();
   const visible = data
@@ -83,6 +94,17 @@ export default function Customers() {
           onCancel={() => setAdding(false)}
           onSaved={() => { setAdding(false); reload(); }}
         />
+      )}
+
+      {overdueCount > 0 && (
+        <button onClick={remindAllOverdue} className="w-full rounded-lg bg-red-50 py-2 text-sm font-semibold text-red-800 ring-1 ring-red-200">
+          {t('sms.remind_all', { count: overdueCount })}
+        </button>
+      )}
+      {reminderResult && (
+        <p className={`rounded-lg p-2 text-sm ${reminderResult.ok ? 'bg-green-50 text-green-900' : 'bg-red-50 text-red-700'}`}>
+          {reminderResult.text} {reminderResult.ok && <Link to="/sms" className="font-semibold underline">{t('sms.open_outbox')}</Link>}
+        </p>
       )}
 
       <input

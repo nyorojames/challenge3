@@ -53,6 +53,12 @@ export default function Dashboard() {
         </Link>
       )}
 
+      {s.unmatched_mpesa_count > 0 && (
+        <Link to="/mpesa" className="block rounded-lg bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200">
+          {t('dashboard.unmatched_mpesa', { count: s.unmatched_mpesa_count })} →
+        </Link>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <Card
           title={t('dashboard.owed')} value={formatKES(s.total_owed)}

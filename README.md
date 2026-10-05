@@ -8,7 +8,7 @@ working offline.
 A localized clone of **Rational** (YC Summer 2026), "an
 accounting firm run entirely by AI employees".
 
-> 🚧 Work in progress. Phases 0–3 (setup, backend API, frontend core, AI entry) are done. The demo script and full docs come in Phase 5.
+> 🚧 Work in progress. Phases 0–4 (setup, backend API, frontend core, AI entry, M-Pesa + SMS) are done. The demo script and full docs come in Phase 5.
 
 ## Demo login
 
@@ -111,7 +111,7 @@ Set `AI_PROVIDER` in `server/.env`:
 | Provider | Needs | Notes |
 |---|---|---|
 | `rules` (default) | nothing | Rule-based Swahili/English/Sheng parser. Works offline, never fails. |
-| `gemini` | free key from [Google AI Studio](https://aistudio.google.com/apikey) in `GEMINI_API_KEY` | Model from `LLM_MODEL`. Free tier has rate limits; a 429 falls back to rules. |
+| `gemini` | free key from [Google AI Studio](https://aistudio.google.com/apikey) in `GEMINI_API_KEY` | Model from `LLM_MODEL` (default `gemini-flash-lite-latest`, ~1 s). Busy (503) or over quota (429) falls back to rules. |
 | `ollama` | [Ollama](https://ollama.com) running locally, then `ollama pull llama3.2:3b` | Model from `OLLAMA_MODEL`. Fully offline once downloaded. |
 
 If the chosen provider errors, takes longer than `AI_TIMEOUT_MS` (5 s), or returns
@@ -125,6 +125,31 @@ you check/edit it → **Confirm** puts it in the ledger (or **Discard** voids it
 |---|---|---|
 | POST | `/api/ai/parse` | `{ text }` → `{ entry, provider, basic_mode, fallback_reason, raw_input }` (writes nothing) |
 | PUT | `/api/transactions/:id` | edit a draft (409 once confirmed) |
+
+## 6. M-Pesa and SMS (simulated, no sign-up)
+
+**M-Pesa (STK Push):** on an owing customer's page tap **📲 Request M-Pesa**. A phone appears
+and asks "Pay KES X to DUKA LA MAMA NJERI? Enter M-PESA PIN" (any 4 digits). **Confirm**
+sends Daraja's real success callback (ResultCode 0); **Cancel** sends ResultCode 1032.
+On success the payment is matched to the customer by phone and the debt drops at once.
+A payment from an unknown number is **unmatched** and waits on the M-Pesa page for you to
+assign it. **Developer tools → Resend last callback** replays the last callback to show
+that a repeated callback never creates a second payment.
+
+**SMS:** **✉️ Remind** on a customer page, or **Remind all overdue** on the Customers page.
+Messages are short, polite, in the shop's language, and appear in the **SMS** tab.
+
+| Method | Path | What it does |
+|---|---|---|
+| POST | `/api/mpesa/stk-push` | `{ customer_id \| phone, amount }` → pending payment + `checkout_request_id` |
+| POST | `/api/mpesa/simulate` | `{ checkout_request_id, action: confirm \| cancel }` (mock only) |
+| POST | `/api/mpesa/callback` | **no login**: Daraja's STK callback; idempotent; always `{ResultCode:0}` |
+| GET | `/api/mpesa/payments?status=` | payments (pending, success, failed, unmatched) |
+| POST | `/api/mpesa/payments/:id/assign` | `{ customer_id }` for an unmatched payment |
+| POST | `/api/mpesa/resend-last` | dev only: replay the last callback |
+| POST | `/api/sms/remind/:customerId` | send one reminder |
+| POST | `/api/sms/remind-overdue` | remind all overdue (skips no phone / reminded in last 20 h) |
+| GET | `/api/sms/messages` | the outbox |
 
 ## Project layout
 

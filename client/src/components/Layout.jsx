@@ -8,6 +8,8 @@ const NAV = [
   { to: '/customers', key: 'nav.customers', icon: '👥' },
   { to: '/new', key: 'nav.new', icon: '➕' },
   { to: '/products', key: 'nav.products', icon: '📦' },
+  { to: '/mpesa', key: 'nav.mpesa', icon: '📲' },
+  { to: '/sms', key: 'nav.sms', icon: '✉️' },
 ];
 
 // Header on top, page in the middle, tab bar at the bottom (like a phone app).
@@ -35,14 +37,14 @@ export default function Layout() {
       </main>
 
       <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-2xl grid-cols-4">
+        <div className="mx-auto grid max-w-2xl grid-cols-6">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.to === '/'}
               className={({ isActive }) =>
-                `flex flex-col items-center py-2 text-xs ${isActive ? 'font-semibold text-emerald-700' : 'text-slate-500'}`
+                `flex flex-col items-center py-2 text-[11px] ${isActive ? 'font-semibold text-emerald-700' : 'text-slate-500'}`
               }
             >
               <span className="text-lg" aria-hidden>{item.icon}</span>

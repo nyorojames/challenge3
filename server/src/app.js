@@ -10,6 +10,8 @@ import supplierRoutes from './routes/suppliers.js';
 import transactionRoutes from './routes/transactions.js';
 import reportRoutes from './routes/reports.js';
 import aiRoutes from './routes/ai.js';
+import mpesaRoutes, { mpesaCallback } from './routes/mpesa.js';
+import smsRoutes from './routes/sms.js';
 
 // The app is built here and started in server.js, so tests can use it
 // with Supertest without opening a real port.
@@ -24,6 +26,8 @@ app.get('/api/health', async (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+// Safaricom calls this, not a logged-in user, so it sits before requireAuth.
+app.post('/api/mpesa/callback', mpesaCallback);
 
 // Everything below needs a logged-in user; req.user.shopId scopes every query.
 app.use('/api', requireAuth);
@@ -33,6 +37,8 @@ app.use('/api/suppliers', supplierRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/mpesa', mpesaRoutes);
+app.use('/api/sms', smsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

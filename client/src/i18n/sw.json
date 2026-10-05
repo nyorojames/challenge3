@@ -17,7 +17,9 @@
     "dashboard": "Leo",
     "customers": "Wateja",
     "new": "Rekodi",
-    "products": "Bidhaa"
+    "products": "Bidhaa",
+    "mpesa": "M-Pesa",
+    "sms": "SMS"
   },
   "login": {
     "title": "Ingia kwenye duka lako",
@@ -43,7 +45,8 @@
     "stock_bought": "Mzigo ulionunuliwa leo",
     "recent": "Rekodi za karibuni",
     "empty": "Hakuna rekodi bado",
-    "new_entry": "+ Rekodi mpya"
+    "new_entry": "+ Rekodi mpya",
+    "unmatched_mpesa": "Malipo {count} ya M-Pesa hayajulikani ni ya nani"
   },
   "customers": {
     "title": "Wateja",
@@ -72,7 +75,10 @@
     "void_confirm": "Futa rekodi hii? Itabaki kwenye historia ikionyesha imefutwa.",
     "voided": "Imefutwa",
     "draft": "Rasimu",
-    "not_found": "Mteja hakupatikana"
+    "not_found": "Mteja hakupatikana",
+    "request_mpesa": "📲 Omba M-Pesa",
+    "remind": "✉️ Kumbusha",
+    "reminded": "SMS imetumwa ✓"
   },
   "products": {
     "title": "Bidhaa",
@@ -139,5 +145,49 @@
     "confirm": "Thibitisha",
     "discard": "Futa",
     "drafts": "Rasimu {count} zinasubiri"
+  },
+  "mpesa": {
+    "title": "Malipo ya M-Pesa",
+    "request_title": "Omba malipo kwa M-Pesa",
+    "request_hint": "Mteja atapokea ombi kwenye simu yake na kuweka PIN.",
+    "send_request": "Tuma ombi",
+    "request_short": "Omba",
+    "walk_in_placeholder": "Namba ya simu, mf. 0799 000 111",
+    "history": "Historia ya M-Pesa",
+    "unmatched_title": "Malipo {count} hayajulikani",
+    "unmatched_hint": "Pesa imefika lakini namba haimo kwenye wateja wako. Chagua ni ya mteja gani.",
+    "assign": "Weka",
+    "status_success": "Imelipwa",
+    "status_unmatched": "Haijulikani",
+    "status_pending": "Inasubiri",
+    "status_failed": "Imeghairiwa",
+    "outcome_success": "✓ Malipo yamepokelewa. Deni limepunguzwa.",
+    "outcome_unmatched": "Malipo yamepokelewa, lakini namba haimo kwenye wateja. Yaweke kwenye ukurasa wa M-Pesa.",
+    "outcome_failed": "Ombi limeghairiwa. Hakuna pesa iliyolipwa.",
+    "outcome_unknown_request": "Ombi hili halijulikani.",
+    "dev_tools": "Zana za msanidi (demo)",
+    "resend_hint": "Tuma tena callback ya mwisho kama Safaricom ikirudia. Hakuna malipo mapya yatakayoundwa.",
+    "resend": "Tuma tena callback ya mwisho",
+    "resend_duplicate": "✓ Callback hii ilishashughulikiwa ({receipt}). Hakuna malipo mapya: deni halijabadilika."
+  },
+  "phone": {
+    "prompt": "Lipa {amount} kwa {shop}? Weka PIN yako ya M-PESA:",
+    "pin": "PIN ya M-PESA",
+    "demo_pin": "Demo: PIN yoyote ya tarakimu 4",
+    "cancel": "Ghairi",
+    "confirm": "Thibitisha",
+    "cancelled": "Ombi limeghairiwa.",
+    "confirmed": "{receipt} Imethibitishwa. {amount} imelipwa kwa {shop}. Asante kwa kutumia M-PESA."
+  },
+  "sms": {
+    "title": "SMS zilizotumwa",
+    "subtitle": "Ujumbe unaotumwa kupitia mtoa huduma wa majaribio (mock): hakuna SMS halisi.",
+    "messages": "Ujumbe",
+    "count": "Ujumbe {count}",
+    "empty": "Hakuna ujumbe bado",
+    "to": "Kwa",
+    "open_outbox": "Fungua SMS",
+    "remind_all": "✉️ Kumbusha wote waliochelewa ({count})",
+    "bulk_result": "SMS {sent} zimetumwa, {skipped} zimerukwa (hakuna simu au walikumbushwa leo)."
   }
 }

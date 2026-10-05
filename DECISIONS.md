@@ -142,3 +142,42 @@ Short notes on the important choices and why. Newest phase at the bottom.
 - **The prompt asks for `unit_price: null` on sales**: prices always come from the database.
 - **`basic_mode` is shown whenever the rules parser answered**, both when chosen in .env and as a fallback.
   The badge's tooltip gives the reason ("ollama: could not connect").
+- **Default Gemini model is `gemini-flash-lite-latest`** (tested live with a real key in Phase 4).
+  `gemini-2.5-flash` is retired for new keys (404). On the free tier the bigger Flash models
+  answered 503 "high demand" or 429 "quota". Flash-Lite answered in ~1 s and parsed every
+  test sentence correctly. A "-latest" alias doesn't get retired.
+
+## Phase 4 — Mock M-Pesa + mock SMS
+
+- **The callback handler (`services/mpesa.js#handleStkCallback`) is real; only the sender is
+  mocked.** `/api/mpesa/simulate` builds Daraja's exact STK callback JSON
+  (ResultCode 0 + CallbackMetadata, or 1032) and calls the same function as
+  `POST /api/mpesa/callback`. Swapping in real Daraja only means a new `stkPush` adapter.
+- **Idempotency in three layers:** `SELECT … FOR UPDATE` on the pending row (two copies arriving
+  at once are handled one after the other), only `pending` rows are processed (a repeat returns
+  `duplicate: true`), and `receipt_number UNIQUE` in the schema as a last line of defence.
+  Tested with 1 retry, 3 simultaneous copies and the "resend last" button.
+- **The customer is matched by the PAYING phone in the callback** (normalized `2547…`),
+  as the spec says, not by whom we asked. No match → `unmatched`, money parked, with
+  no ledger entry until the shopkeeper assigns it (assign is also locked and only works once).
+- **The callback route has no login** (Safaricom calls it) and always answers
+  `{ResultCode: 0, ResultDesc: 'Accepted'}` so Daraja stops retrying. Unknown
+  CheckoutRequestIDs are acknowledged and ignored. Production would add a secret URL token
+  and Safaricom's IP allow-list (noted in the code).
+- **An M-Pesa payment becomes a `confirmed` ledger entry with `source: 'mpesa'`** and a
+  server-made UUID (no device involved), so the balance drops immediately.
+- **STK push can target a customer or a plain phone number.** Asking a walk-in to pay is
+  the realistic way to get an `unmatched` payment in the demo.
+- **The PhoneSimulator plays the customer's phone:** amount → STK prompt with PIN
+  (any 4 digits) → Safaricom-style confirmation SMS. The shopkeeper's result (paid /
+  unmatched / cancelled) is shown in a strip under it.
+- **"Resend last callback" is in a collapsed "Developer tools" box on the M-Pesa page**,
+  always visible in the UI; the server refuses it when `NODE_ENV=production`.
+- **SMS text is in the shop's language** (`shops.language`), not the UI language: the
+  customer reads it, not the shopkeeper. ≤160 characters (one SMS part, tested).
+- **"Remind all overdue" skips anyone reminded in the last 20 hours** and anyone without a
+  phone, and reports what it skipped. The single "Remind" button always sends (the shopkeeper chose to).
+- **The SMS mock delivers by writing to `sms_messages`**, which the Outbox page shows like a
+  phone's message list. A real Africa's Talking adapter would call the API and log the same row.
+- **6 tabs in the bottom nav** (Today, Customers, New, Products, M-Pesa, SMS), so every demo
+  page is one tap away.

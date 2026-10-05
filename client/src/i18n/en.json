@@ -17,7 +17,9 @@
     "dashboard": "Today",
     "customers": "Customers",
     "new": "New entry",
-    "products": "Products"
+    "products": "Products",
+    "mpesa": "M-Pesa",
+    "sms": "SMS"
   },
   "login": {
     "title": "Log in to your shop",
@@ -43,7 +45,8 @@
     "stock_bought": "Stock bought today",
     "recent": "Recent entries",
     "empty": "No entries yet",
-    "new_entry": "+ New entry"
+    "new_entry": "+ New entry",
+    "unmatched_mpesa": "{count} M-Pesa payments need a customer"
   },
   "customers": {
     "title": "Customers",
@@ -72,7 +75,10 @@
     "void_confirm": "Void this entry? It stays in the history, marked as void.",
     "voided": "Void",
     "draft": "Draft",
-    "not_found": "Customer not found"
+    "not_found": "Customer not found",
+    "request_mpesa": "📲 Request M-Pesa",
+    "remind": "✉️ Remind",
+    "reminded": "SMS sent ✓"
   },
   "products": {
     "title": "Products",
@@ -139,5 +145,49 @@
     "confirm": "Confirm",
     "discard": "Discard",
     "drafts": "{count} drafts waiting"
+  },
+  "mpesa": {
+    "title": "M-Pesa payments",
+    "request_title": "Request an M-Pesa payment",
+    "request_hint": "The customer gets a prompt on their phone and enters their PIN.",
+    "send_request": "Send request",
+    "request_short": "Request",
+    "walk_in_placeholder": "Phone number, e.g. 0799 000 111",
+    "history": "M-Pesa history",
+    "unmatched_title": "{count} unmatched payments",
+    "unmatched_hint": "Money arrived from a number that is not one of your customers. Choose who it belongs to.",
+    "assign": "Assign",
+    "status_success": "Paid",
+    "status_unmatched": "Unmatched",
+    "status_pending": "Pending",
+    "status_failed": "Cancelled",
+    "outcome_success": "✓ Payment received. The debt was reduced.",
+    "outcome_unmatched": "Payment received, but the number is not a customer. Assign it on the M-Pesa page.",
+    "outcome_failed": "Request cancelled. Nothing was paid.",
+    "outcome_unknown_request": "Unknown request.",
+    "dev_tools": "Developer tools (demo)",
+    "resend_hint": "Send the last callback again, as if Safaricom retried. No new payment should be created.",
+    "resend": "Resend last callback",
+    "resend_duplicate": "✓ Already processed ({receipt}). No new payment: the balance did not change."
+  },
+  "phone": {
+    "prompt": "Pay {amount} to {shop}? Enter your M-PESA PIN:",
+    "pin": "M-PESA PIN",
+    "demo_pin": "Demo: any 4-digit PIN",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "cancelled": "Request cancelled.",
+    "confirmed": "{receipt} Confirmed. {amount} paid to {shop}. Thank you for using M-PESA."
+  },
+  "sms": {
+    "title": "SMS Outbox",
+    "subtitle": "Messages sent through the mock SMS gateway: no real SMS leaves the laptop.",
+    "messages": "Messages",
+    "count": "{count} messages",
+    "empty": "No messages yet",
+    "to": "To",
+    "open_outbox": "Open SMS outbox",
+    "remind_all": "✉️ Remind all overdue ({count})",
+    "bulk_result": "{sent} SMS sent, {skipped} skipped (no phone or already reminded today)."
   }
 }

@@ -46,6 +46,10 @@ router.get('/summary', async (req, res) => {
     "SELECT COUNT(*) AS drafts FROM transactions WHERE shop_id = $1 AND status = 'draft'",
     [shopId]
   );
+  const { rows: mpesaRows } = await pool.query(
+    "SELECT COUNT(*) AS unmatched FROM mpesa_payments WHERE shop_id = $1 AND status = 'unmatched'",
+    [shopId]
+  );
   const { rows: stockRows } = await pool.query(
     'SELECT COUNT(*) AS low_stock_count FROM products WHERE shop_id = $1 AND stock_qty < reorder_level',
     [shopId]
@@ -79,6 +83,7 @@ router.get('/summary', async (req, res) => {
     overdue_amount: overdue.reduce((sum, c) => sum + c.balance, 0),
     low_stock_count: stockRows[0].low_stock_count,
     draft_count: draftRows[0].drafts,
+    unmatched_mpesa_count: mpesaRows[0].unmatched,
   });
 });
 
