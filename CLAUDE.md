@@ -20,7 +20,7 @@ abstractions, explain decisions**.
 
 ## Phases
 0 Setup ✅ · 1 Backend core ✅ · 2 Frontend core ✅ · 3 AI entry ✅ · 4 Mock M-Pesa + SMS ✅ ·
-5 Offline + demo polish (built, awaiting approval). (Update the ✅ as phases are approved.)
+5 Offline + demo polish ✅. (Update the ✅ as phases are approved.)
 
 ## Stack
 - `server/`: Node 22, Express 5, ES modules, `pg` with **plain SQL (no ORM)**, zod,
@@ -91,7 +91,7 @@ UUID prefixes: `a…` shop/user, `b…` suppliers, `c…` products, `d…` custo
 - `session.jsx` — login/logout, caches `{user, shop}`; `i18n/index.jsx` — `useT()` → `{t, lang, setLang}`.
   **Every UI string goes in both `sw.json` and `en.json`.**
 - `lib/format.js` (KES, dates in Africa/Nairobi), `lib/ids.js#newId()` (client UUIDs).
-- `components/Layout.jsx` (header with SW|EN toggle + bottom nav), `DueBadge`, `TransactionRow`, `Status`.
+- `components/Layout.jsx` (header with EN|SW toggle + bottom nav; UI defaults to English, choice remembered in localStorage), `DueBadge`, `TransactionRow`, `Status`.
 - Pages: Login, Dashboard, Customers (`?filter=owing|overdue`), CustomerDetail (void),
   Products (`?low=1`), NewEntry (tabs: AI sentence | form; `?type=&customer=` opens the form).
 - `components/EntryForm.jsx` is shared by manual entry and AI draft review; `AiEntry.jsx`
