@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { api, tokenStore } from './api/client.js';
-import { useT } from './i18n/index.jsx';
 
 const SessionContext = createContext(null);
 const SHOP_KEY = 'duka.session';
@@ -17,7 +16,6 @@ function readCachedSession() {
 
 export function SessionProvider({ children }) {
   const [session, setSession] = useState(readCachedSession); // { user, shop } or null
-  const { setLang } = useT();
 
   const logout = useCallback(() => {
     tokenStore.clear();
@@ -29,8 +27,6 @@ export function SessionProvider({ children }) {
     const { token, user, shop } = await api('/auth/login', { method: 'POST', body: { phone, password } });
     tokenStore.set(token);
     localStorage.setItem(SHOP_KEY, JSON.stringify({ user, shop }));
-    // First login on this device: start in the shop's language.
-    if (!localStorage.getItem('duka.lang')) setLang(shop.language);
     setSession({ user, shop });
   };
 

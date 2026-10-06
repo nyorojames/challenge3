@@ -211,3 +211,11 @@ Short notes on the important choices and why. Newest phase at the bottom.
 - Verified end to end in Chromium (Playwright): offline reload served by the service worker,
   AI sentence parsed in the browser, 2 entries queued, auto-sync on reconnect, balances
   and totals updated once.
+
+## After Phase 5
+
+- **The app now opens in English, with an EN | SW switch (English first).** Requested by the
+  user for presenting. The default changed from `sw` to `en`, and the app no longer switches to
+  the shop's language on first login. The user's last choice is still remembered per device.
+  SMS reminders still use the shop's language (`shops.language = 'sw'` in the seed), because
+  the customer reads them, not the shopkeeper.

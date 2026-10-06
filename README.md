@@ -51,17 +51,17 @@ npm run dev                               #    app on http://localhost:5173
 
 **Before you start (2 minutes beforehand):**
 1. `cd server && npm run db:reset` for fresh data (dates are relative to today, so Mama Wanjiku is always overdue).
-2. Log in, then open **Wateja** (Customers) and **Rekodi** (New entry) once, so the
+2. Log in, then open **Customers** and **New entry** once, so the
    app has a copy of the customer and product lists for the offline part.
 3. Optional: set `AI_PROVIDER=gemini` and your key in `server/.env` for the real LLM.
    Without it, everything still works in **basic mode**.
 
 | Time | Do this | Point out |
 |---|---|---|
-| 0:00 | Log in. The app opens in **Swahili** on the dashboard (*Leo*). | Today's sales split into cash / M-Pesa / credit; KES 2,723 owed; 1 customer overdue. |
-| 0:15 | **Rekodi** → type *Mama Wanjiku amechukua sukari 2kg na mafuta, atalipa Ijumaa* → **✨ Soma**. | The AI found the customer, the products, the prices and **Friday's date**. It's saved as a **draft** (*Rasimu*): nothing is in the books yet. |
-| 0:35 | **Thibitisha** (Confirm). | Her page: balance 500 → **1,150**. Still red: her *old* debt is 13 days late (FIFO rule). |
-| 0:45 | Switch **SW → EN** in the header. Tap **✉️ Remind**. Open the **SMS** tab. | A polite reminder with her balance and the shop name, in the shop's language, shown like a phone's inbox. |
+| 0:00 | Log in. The app opens in **English** on the dashboard (*Today*). | Today's sales split into cash / M-Pesa / credit; KES 2,723 owed; 1 customer overdue. |
+| 0:15 | **New entry** → type *Mama Wanjiku amechukua sukari 2kg na mafuta, atalipa Ijumaa* → **✨ Read it**. | The AI understood a **Swahili** sentence: the customer, the products, the prices and **Friday's date**. It's saved as a **draft**: nothing is in the books yet. |
+| 0:35 | **Confirm**. | Her page: balance 500 → **1,150**. Still red: her *old* debt is 13 days late (FIFO rule). |
+| 0:45 | Switch **EN → SW** in the header to show the Swahili interface, then back to **EN**. Tap **✉️ Remind**. Open the **SMS** tab. | The whole app is bilingual. The reminder is in the *shop's* language (Swahili), with her balance and the shop name, shown like a phone's inbox. |
 | 1:00 | Back on her page: **📲 Request M-Pesa** → **Send request**. On the phone: PIN `1234` → **Confirm**. | Daraja-style STK prompt and receipt. Her debt drops to **KES 0** automatically. |
 | 1:15 | *(optional)* **M-Pesa** tab → Developer tools → **Resend last callback**. | "Already processed": a repeated callback never pays twice (idempotency). |
 | 1:25 | Go offline: **DevTools (F12) → Network → Offline** (or turn Wi-Fi off). | Header turns red: **Offline**. |

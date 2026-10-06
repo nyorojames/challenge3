@@ -15,8 +15,8 @@ function readSavedLanguage() {
 }
 
 export function LanguageProvider({ children }) {
-  // Swahili is the default; the user's last choice wins after that.
-  const [lang, setLangState] = useState(() => readSavedLanguage() || 'sw');
+  // English is the default; the user's last choice (e.g. Swahili) wins after that.
+  const [lang, setLangState] = useState(() => readSavedLanguage() || 'en');
 
   const setLang = (next) => {
     setLangState(next);
